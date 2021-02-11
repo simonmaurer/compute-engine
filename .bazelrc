@@ -32,6 +32,13 @@ build:aarch64 --crosstool_top=@local_config_arm_compiler//:toolchain
 build:aarch64 --cpu=aarch64
 build:aarch64 --copt=-march=armv8-a --copt=-std=gnu++11 --copt=-DS_IREAD=S_IRUSR --copt=-DS_IWRITE=S_IWUSR --copt=-fno-tree-pre --copt=-U__GCC_HAVE_SYNC_COMPARE_AND_SWAP_1 --copt=-U__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2 --copt=-U__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8 --define=framework_shared_object=false --copt=-funsafe-math-optimizations --copt=-ftree-vectorize --copt=-fomit-frame-pointer --verbose_failures
 
+# Enables all the macos config options for macos_arm64
+build:macos_arm64 --config=macos
+build:macos_arm64 --apple_platform_type=macos 
+build:macos_arm64 --cpu=darwin_arm64
+
+build:macs
+
 # Options to build TensorFlow 1.x or 2.x.
 build:v1 --define=tf_api_version=1
 build:v2 --define=tf_api_version=2
@@ -104,6 +111,8 @@ build --define=allow_oversize_protos=true
 # mobile platforms.
 build --enable_platform_specific_config
 build:android --noenable_platform_specific_config
+
+build:macos_arm64 --noenable_platform_specific_config
 
 # Android configs. Bazel needs to have --cpu and --fat_apk_cpu both set to the
 # target CPU to build transient dependencies correctly. See

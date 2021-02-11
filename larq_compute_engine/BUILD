@@ -12,6 +12,42 @@ config_setting(
     values = {"cpu": "aarch64"},
 )
 
+config_setting(
+    name = "macos_x86_64",
+    values = {
+        "apple_platform_type": "macos",
+        "cpu": "darwin",
+    },
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "macos_arm64e",
+    values = {
+        "apple_platform_type": "macos",
+        "cpu": "darwin_arm64e",
+    },
+    visibility = ["//visibility:public"],
+)
+
+config_setting(
+    name = "macos_arm64",
+    values = {
+        "apple_platform_type": "macos",
+        "cpu": "darwin_arm64",
+    },
+    visibility = ["//visibility:public"],
+)
+
+selects.config_setting_group(
+    name = "macos",
+    match_any = [
+        ":macos_x86_64",
+        ":macos_arm64",
+        ":macos_arm64e",
+    ],
+)
+
 py_library(
     name = "compute_engine_py",
     srcs = [
