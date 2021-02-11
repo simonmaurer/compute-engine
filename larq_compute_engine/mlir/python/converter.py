@@ -7,6 +7,7 @@ from larq_compute_engine.mlir._graphdef_tfl_flatbuffer import (
     convert_graphdef_to_tflite_flatbuffer,
 )
 from larq_compute_engine.mlir.python.util import modify_integer_quantized_model_io_type
+from larq_compute_engine.mlir.python.util import modify_bitpacked_quantized_model_io_type
 
 from tensorflow.core.framework.types_pb2 import DataType
 from tensorflow.lite.python.util import get_tensor_name
@@ -58,6 +59,7 @@ def convert_keras_model(
     target: str = "arm",
     experimental_default_int8_range: Optional[Tuple[float, float]] = None,
     experimental_enable_bitpacked_activations: bool = False,
+    experimental_enable_bitpacked_int32_output: bool = False,
 ) -> bytes:
     """Converts a Keras model to TFLite flatbuffer.
 
@@ -163,5 +165,12 @@ def convert_keras_model(
             inference_input_type=inference_input_type,
             inference_output_type=inference_output_type,
         )
-
+    
+    if experimental_enable_bitpacked_int32_output and inference_output_type == tf.float32:
+        tflite_buffer = modify_bitpacked_quantized_model_io_type(
+            tflite_buffer,
+            inference_input_type=inference_input_type,
+            inference_output_type=inference_output_type,
+        )
+    
     return tflite_buffer

@@ -202,3 +202,112 @@ def modify_integer_quantized_model_io_type(
 
     # Convert the model to a bytearray
     return _convert_model_from_object_to_bytearray(model)
+
+
+def _find_lce_dequantize_inputs_outputs(model):
+    """Validate that model input is quantized and output is dequantized."""
+    if len(model.subgraphs) > 1:
+        raise ValueError(
+            "Model must only have one subgraph. Instead, it has "
+            "{} subgraphs.".format(len(model.subgraphs))
+        )
+    subgraph = model.subgraphs[0]
+    tensors = subgraph.tensors
+    operators = subgraph.operators
+
+    # Ensure model has atleast one quantize and dequantize operator
+    quant_opcode_idx, dequant_opcode_idx = None, None
+    for idx, opcode in enumerate(model.operatorCodes):
+        if opcode.builtinCode == tflite_schema.BuiltinOperator.QUANTIZE:
+            quant_opcode_idx = idx
+        elif opcode.customCode == b'LceDequantize':
+            dequant_opcode_idx = idx
+        if quant_opcode_idx is not None and dequant_opcode_idx is not None:
+            break
+    if quant_opcode_idx is None and dequant_opcode_idx is None:
+        raise ValueError(
+            "Model is not integer quantized as it does not "
+            "contain quantize/dequantize operators."
+        )
+
+    # Ensure model inputs and outputs are integer quantized
+    input_quant_ops, output_dequant_ops = [], []
+    for op in operators:
+        # Find input quantize operator
+        if op.opcodeIndex == quant_opcode_idx and op.inputs[0] in subgraph.inputs:
+            pos, float_tensor, int_tensor = (
+                "input",
+                tensors[op.inputs[0]],
+                tensors[op.outputs[0]],
+            )
+            input_quant_ops.append(op)
+        # Find output dequantize operator
+        elif op.opcodeIndex == dequant_opcode_idx and op.outputs[0] in subgraph.outputs:
+            pos, float_tensor, int_tensor = (
+                "output",
+                tensors[op.outputs[0]],
+                tensors[op.inputs[0]],
+            )
+            output_dequant_ops.append(op)
+        # Otherwise, ignore
+        else:
+            continue
+        # If found, validate the input/output tensor type
+        #if float_tensor.type != tflite_schema.TensorType.FLOAT32:
+        #    raise ValueError(
+        #        "Model {} type must be tf.float32. Expected type for tensor with "
+        #        "name '{}' is tf.float32, instead type is tf.{}".format(
+        #            pos,
+        #            float_tensor.name,
+        #            _convert_tflite_enum_type_to_tf_type(float_tensor.type).name,
+        #        )
+        #    )
+        #if int_tensor.type != tflite_schema.TensorType.INT8:
+        #    raise ValueError(
+        #        "Model is not integer quantized. Expected type for tensor with "
+        #        "name '{}' is tf.int8, instead type is tf.{}".format(
+        #            int_tensor.name,
+        #            _convert_tflite_enum_type_to_tf_type(int_tensor.type).name,
+        #        )
+        #    )
+
+    return input_quant_ops, output_dequant_ops
+
+
+def modify_bitpacked_quantized_model_io_type(
+    model,
+    inference_input_type=tf.float32,
+    inference_output_type=tf.float32,
+):
+    """Modify the float input/output type of an integer quantized model."""
+    # Convert the model to an object
+    model = _convert_model_from_bytearray_to_object(model)
+
+    # Validate the integer quantized model
+    input_quant_ops, output_dequant_ops = _find_lce_dequantize_inputs_outputs(model)
+
+    subgraph = model.subgraphs[0]
+    operators = subgraph.operators
+    remove_tensors_idxs = set()
+
+    # Modify model input type
+    if inference_input_type == tf.float32:
+        # Remove the inputs and the quant operator
+        for op in input_quant_ops:
+            subgraph.inputs[subgraph.inputs == op.inputs[0]] = op.outputs[0]
+            remove_tensors_idxs.add(op.inputs[0])
+            operators.remove(op)
+
+    # Modify model output type
+    if inference_output_type == tf.float32:
+        # Remove the outputs and the dequant operator
+        for op in output_dequant_ops:
+            subgraph.outputs[subgraph.outputs == op.outputs[0]] = op.inputs[0]
+            remove_tensors_idxs.add(op.outputs[0])
+            operators.remove(op)
+
+    # Remove tensors marked for deletion.
+    _remove_tensors_from_model(model, remove_tensors_idxs)
+
+    # Convert the model to a bytearray
+    return _convert_model_from_object_to_bytearray(model)
