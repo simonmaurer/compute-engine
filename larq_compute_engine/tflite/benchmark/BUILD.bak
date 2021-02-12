@@ -13,7 +13,13 @@ cc_binary(
         "lce_benchmark_main.cc",
     ],
     copts = ["-Wall"] + tflite_copts(),
-    linkopts = tflite_linkopts(),
+    linkopts = tflite_linkopts() + select({
+        "@org_tensorflow//tensorflow:android": [
+            "-pie",  # Android 5.0 and later supports only PIE
+            "-lm",  # some builtin ops, e.g., tanh, need -lm
+        ],
+        "//conditions:default": [],
+    }),
     deps = [
         "//larq_compute_engine/tflite/kernels:lce_op_kernels",
         "@org_tensorflow//tensorflow/lite/tools:logging",
