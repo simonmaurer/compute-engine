@@ -48,7 +48,7 @@ arm_compiler_configure(
 http_archive(
     name = "org_tensorflow",
     sha256 = "743219836d35f4dd8a9963a66deac79b13d8aa4ecbe80b414fcb8ac0733aa527",
-    strip_prefix = "tensorflow-2.4.1",
+    strip_prefix = "tensorflow-bab0d14036efd0adcd4e48303d045cee3c342cb0",
     urls = [
         "https://github.com/tensorflow/tensorflow/archive/bab0d14036efd0adcd4e48303d045cee3c342cb0.tar.gz",
     ],
