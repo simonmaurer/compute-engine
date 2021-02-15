@@ -4,7 +4,7 @@ set -e
 # default LCE Android Env. variables
 export ANDROID_SDK_URL="https://dl.google.com/android/repository/commandlinetools-mac-6858069_latest.zip"
 export ANDROID_HOME="/tmp/lce_android"
-export ANDROID_VERSION=29
+export ANDROID_VERSION=30
 export ANDROID_BUILD_TOOLS_VERSION=29.0.3
 export ANDROID_NDK_VERSION=21.4.7075529
 
