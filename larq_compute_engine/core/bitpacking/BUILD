@@ -8,6 +8,12 @@ cc_library(
         "//larq_compute_engine:aarch64_build": [
             "bitpack_aarch64.h",
         ],
+        "//larq_compute_engine:macos_arm64": [
+            "bitpack_aarch64.h",
+        ],
+        "//larq_compute_engine:macos_arm64e": [
+            "bitpack_aarch64.h",
+        ],
         "@org_tensorflow//tensorflow:android_arm64": [
             "bitpack_aarch64.h",
         ],
