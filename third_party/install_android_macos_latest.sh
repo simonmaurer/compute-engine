@@ -6,7 +6,7 @@ export ANDROID_SDK_URL="https://dl.google.com/android/repository/commandlinetool
 export ANDROID_HOME="/tmp/lce_android"
 export ANDROID_VERSION=29
 export ANDROID_BUILD_TOOLS_VERSION=29.0.3
-export ANDROID_NDK_VERSION=18.1.5063045
+export ANDROID_NDK_VERSION=21.4.7075529
 
 # download android SDK
 mkdir -p $ANDROID_HOME; cd $ANDROID_HOME;
