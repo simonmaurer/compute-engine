@@ -123,6 +123,11 @@ build:android_x86_64 --config=android
 build:android_x86_64 --cpu=x86_64
 build:android_x86_64 --fat_apk_cpu=x86_64
 
+# Enables all the macos config options for macos_arm64
+build:macos_arm64 --config=macos
+build:macos_arm64 --apple_platform_type=macos 
+build:macos_arm64 --cpu=darwin_arm64
+
 # Default options should come above this line
 
 # Options from ./configure
