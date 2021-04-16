@@ -57,6 +57,8 @@ build:macos_arm64 --config=macos
 build:macos_arm64 --apple_platform_type=macos 
 build:macos_arm64 --cpu=darwin_arm64
 
+build:macos_arm64 --noenable_platform_specific_config
+
 # Config-specific options should come above this line.
 
 # Options from ./configure
