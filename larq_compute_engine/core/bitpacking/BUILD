@@ -11,6 +11,9 @@ cc_library(
         "@org_tensorflow//tensorflow:android_arm64": [
             "bitpack_aarch64.h",
         ],
+        "//larq_compute_engine:macos_arm64": [
+            "bitpack_aarch64.h",
+        ],
         "//conditions:default": [],
     }),
     deps = [
