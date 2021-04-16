@@ -52,6 +52,11 @@ build:macos --copt=-Wno-deprecated-declarations
 # Windows generates *a lot* of warnings; disable them all.
 build:windows --copt=/W0
 
+# Enables all the macos config options for macos_arm64
+build:macos_arm64 --config=macos
+build:macos_arm64 --apple_platform_type=macos 
+build:macos_arm64 --cpu=darwin_arm64
+
 # Config-specific options should come above this line.
 
 # Options from ./configure
